@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import org.geeksforgeeks.grocery.data.local.GroceryItems
 import org.geeksforgeeks.grocery.ui.GroceryViewModel
 
@@ -21,9 +23,21 @@ class GroceryAdapter(var list: List<GroceryItems>, private val viewModel: Grocer
 
     override fun onBindViewHolder(holder: GroceryViewHolder, position: Int) {
         val currentPosition = list[position]
-        holder.txtItemName.text = currentPosition.itemName
-        holder.txtItemPrice.text = "₹${currentPosition.itemPrice}"
-        holder.txtItemQuantity.text = "${currentPosition.itemQuantity}"
+        holder.txtItemName.text = currentPosition.itemName.lowercase()
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
+        holder.txtItemPrice.text = "Price: ₹${currentPosition.itemPrice}"
+        holder.txtItemQuantity.text = "Quantity: ${currentPosition.itemQuantity}"
+        Glide.with(holder.itemView.context).load(
+            when(currentPosition.itemName.trim().lowercase()) {
+                "banana" -> R.drawable.banana
+                "kiwi" -> R.drawable.kiwi
+                "apple" -> R.drawable.apple
+                "orange" -> R.drawable.orange
+                "potato" -> R.drawable.potato
+                else -> R.drawable.vegetables
+            }
+        ).into(holder.imgItemImage)
 
         holder.ibDelete.setOnClickListener {
             viewModel.delete(currentPosition)
@@ -49,6 +63,7 @@ class GroceryAdapter(var list: List<GroceryItems>, private val viewModel: Grocer
         val txtItemQuantity: TextView = itemView.findViewById(R.id.txtItemQuantity)
         val txtItemTotalCost: TextView = itemView.findViewById(R.id.txtItemTotalCost)
         val txtTotalCostTitle: TextView = itemView.findViewById(R.id.txtTotalCostTitle)
+        val imgItemImage: ImageView = itemView.findViewById(R.id.imgItemImage)
         val ibDelete: ImageButton = itemView.findViewById(R.id.ibDelete)
     }
 }
